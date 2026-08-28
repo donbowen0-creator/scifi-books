@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Aegis Cycle — Donald Bowen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ash-sky:#c9c3b5;
+    --ash-mid:#8d8676;
+    --dome:#121110;
+    --char:#17140f;
+    --char-2:#1e1a14;
+    --amber:#e0a438;
+    --amber-dim:#8a5e1e;
+    --amber-soft:rgba(224,164,56,0.16);
+    --bone:#eae4d6;
+    --bone-dim:#b7ae9c;
+    --frost:#7c8a8c;
+    --rule:rgba(234,228,214,0.14);
+    --measure:62ch;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--char);
+    color:var(--bone);
+    font-family:'Spectral',serif;
+    font-size:17px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--amber-dim);color:var(--bone);}
+
+  h1,h2,h3,.display{
+    font-family:'Cinzel',serif;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--bone);
+    margin:0;
+  }
+  .mono{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-size:12px;
+  }
+  a{color:var(--amber);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+
+  /* ---------- grain overlay ---------- */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:50;opacity:0.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 900px 500px at 50% 78%, var(--amber-soft), transparent 70%),
+      linear-gradient(180deg, var(--ash-sky) 0%, #6e695d 34%, #2b2620 58%, var(--dome) 78%, #0b0a08 100%);
+  }
+  .hero .skyline{
+    position:absolute;left:0;right:0;bottom:0;height:46%;
+    background:var(--dome);
+    clip-path:polygon(0% 100%, 0% 62%, 6% 58%, 14% 60%, 20% 50%, 30% 46%, 38% 52%, 46% 44%,
+      50% 36%, 54% 44%, 62% 52%, 70% 46%, 80% 50%, 86% 60%, 94% 58%, 100% 62%, 100% 100%);
+  }
+  .hero .glow-seam{
+    position:absolute;left:50%;bottom:8%;width:520px;max-width:70vw;height:220px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 100%, rgba(224,164,56,0.5), transparent 65%);
+    filter:blur(6px);
+    animation:seampulse 7s ease-in-out infinite;
+  }
+  @keyframes seampulse{
+    0%,100%{opacity:0.55;}
+    50%{opacity:0.9;}
+  }
+  .ash-particles{position:absolute;inset:0;overflow:hidden;}
+  .ash-particles span{
+    position:absolute;top:-5%;
+    width:3px;height:3px;border-radius:50%;
+    background:var(--bone-dim);
+    opacity:0.5;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    to{ transform:translateY(115vh) translateX(var(--drift,0px)); }
+  }
+
+  .hero-inner{position:relative;z-index:2;padding:0 24px;}
+  .sigil{width:96px;height:auto;margin:0 auto 28px;display:block;opacity:0;animation:sigilin 1.4s 0.3s ease forwards;}
+  @keyframes sigilin{to{opacity:1;}}
+  .sigil path.stroke{
+    stroke-dasharray:400;stroke-dashoffset:400;
+    animation:draw 2.6s 0.4s ease forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  .kicker{color:var(--amber);margin-bottom:18px;display:block;}
+  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.05;}
+  .hero h1 em{font-style:normal;color:var(--amber);}
+  .tagline{
+    margin:22px auto 0;max-width:44ch;
+    font-family:'Spectral',serif;font-style:italic;font-weight:400;
+    color:var(--bone-dim);font-size:1.15rem;
+  }
+  .scrollcue{
+    position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+    color:var(--frost);font-size:11px;z-index:2;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .scrollcue .line{width:1px;height:34px;background:linear-gradient(var(--frost),transparent);}
+
+  /* ---------- section shared ---------- */
+  section{padding:110px 0;}
+  .section-head{max-width:var(--measure);margin:0 auto 56px;}
+  .section-head .mono{color:var(--frost);display:block;margin-bottom:14px;}
+  .section-head h2{font-size:1.9rem;}
+  .lede{max-width:var(--measure);margin:0 auto;color:var(--bone-dim);font-size:1.08rem;}
+  .lede em{color:var(--bone);font-style:italic;}
+
+  hr.rule{border:none;border-top:1px solid var(--rule);margin:0;}
+
+  /* ---------- premise ---------- */
+  .premise{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--char-2);}
+  .premise .wrap{text-align:center;}
+  .premise p{max-width:56ch;margin:0 auto;font-size:1.2rem;color:var(--bone);font-style:italic;line-height:1.65;}
+  .premise p span{color:var(--amber);font-style:normal;}
+
+  /* ---------- the record (books) ---------- */
+  .record-list{display:flex;flex-direction:column;}
+  .record{
+    display:grid;
+    grid-template-columns:200px 1fr;
+    gap:44px;
+    padding:48px 0;
+    border-top:1px solid var(--rule);
+    align-items:start;
+  }
+  .record:last-child{border-bottom:1px solid var(--rule);}
+
+  .cover{
+    width:200px;height:296px;border-radius:2px;position:relative;overflow:hidden;
+    box-shadow:0 18px 40px -12px rgba(0,0,0,0.6);
+    border:1px solid rgba(234,228,214,0.12);
+  }
+  .cover .sky{position:absolute;inset:0;background:linear-gradient(180deg,#c9c3b5 0%,#665f52 40%,#241f19 68%,#0d0b08 100%);}
+  .cover .dome{position:absolute;left:0;right:0;bottom:0;height:38%;background:#0d0b08;
+    clip-path:polygon(0 100%,0 55%,20% 40%,50% 28%,80% 40%,100% 55%,100% 100%);}
+  .cover .glow{position:absolute;left:50%;bottom:6%;width:70%;height:40%;transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 100%, rgba(224,164,56,0.55), transparent 70%);filter:blur(4px);}
+  .cover .cover-title{
+    position:absolute;left:0;right:0;top:16px;text-align:center;
+    font-family:'Cinzel',serif;color:var(--bone);font-size:13px;letter-spacing:0.12em;
+    padding:0 14px;text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+  .cover.dim{filter:grayscale(0.4) brightness(0.7);}
+  .cover.veiled{filter:grayscale(0.75) brightness(0.4);}
+  .cover.veiled .cover-title{opacity:0.5;}
+
+  .record-body .status{margin-bottom:10px;}
+  .status.published{color:var(--amber);}
+  .status.draft{color:var(--frost);}
+  .status.planned{color:var(--bone-dim);opacity:0.7;}
+  .record-body h3{font-size:1.5rem;margin-bottom:4px;}
+  .record-body .subtitle{color:var(--bone-dim);font-family:'Spectral',serif;font-style:italic;font-size:0.98rem;margin-bottom:16px;display:block;}
+  .record-body p.desc{max-width:58ch;color:var(--bone-dim);}
+  .record-actions{margin-top:20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+  .btn{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--dome);background:var(--amber);padding:11px 20px;border-radius:2px;display:inline-block;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover{text-decoration:none;transform:translateY(-1px);box-shadow:0 6px 18px -6px rgba(224,164,56,0.5);}
+  .ghost-link{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--frost);border-bottom:1px solid var(--rule);padding-bottom:2px;}
+  .ghost-link:hover{color:var(--amber);text-decoration:none;border-color:var(--amber);}
+
+  .progress-track{width:100%;max-width:280px;height:3px;background:var(--rule);border-radius:2px;margin-top:6px;}
+  .progress-fill{height:100%;background:var(--amber);border-radius:2px;width:64%;}
+  .progress-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--frost);margin-top:8px;display:block;}
+
+  .btn.disabled,.ghost-link.disabled{
+    opacity:0.4;pointer-events:none;
+  }
+
+  /* ---------- other titles ---------- */
+  .other-titles{border-top:1px solid var(--rule);}
+  .other-list{display:flex;flex-direction:column;}
+  .other-row{
+    display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+    padding:28px 0;border-top:1px solid var(--rule);
+  }
+  .other-row:last-child{border-bottom:1px solid var(--rule);}
+  .other-row h3{font-size:1.15rem;font-family:'Cinzel',serif;letter-spacing:0.02em;margin-bottom:4px;}
+  .other-row .other-desc{color:var(--bone-dim);font-size:0.95rem;max-width:56ch;margin:0;}
+  .other-row .other-links{display:flex;gap:18px;flex-shrink:0;flex-wrap:wrap;}
+
+  /* ---------- author ---------- */
+  .author{background:var(--char-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);}
+  .author-grid{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;max-width:var(--measure);margin:0 auto;}
+  .author-mark{width:64px;flex-shrink:0;opacity:0.8;margin-top:6px;}
+  .author h2{font-size:1.7rem;margin-bottom:6px;}
+  .author .role{color:var(--amber);margin-bottom:20px;display:block;}
+  .author p{color:var(--bone-dim);margin:0 0 16px;}
+  .author p:last-child{margin-bottom:0;}
+
+  /* ---------- signal (contact) ---------- */
+  .signal .wrap{text-align:center;}
+  .signal h2{margin-bottom:14px;}
+  .signal p{color:var(--bone-dim);max-width:48ch;margin:0 auto 32px;}
+  form.signal-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:420px;margin:0 auto;}
+  form.signal-form input[type=email]{
+    flex:1;min-width:200px;background:transparent;border:1px solid var(--rule);color:var(--bone);
+    padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;border-radius:2px;
+  }
+  form.signal-form input[type=email]::placeholder{color:var(--bone-dim);}
+  form.signal-form input[type=email]:focus{outline:2px solid var(--amber);outline-offset:2px;border-color:transparent;}
+  form.signal-form button{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    background:var(--amber);color:var(--dome);border:none;padding:12px 22px;border-radius:2px;cursor:pointer;
+  }
+  form.signal-form button:hover{box-shadow:0 6px 18px -6px rgba(224,164,56,0.5);}
+  .form-note{margin-top:14px;font-size:12px;color:var(--frost);font-family:'IBM Plex Mono',monospace;}
+
+  footer{padding:48px 0;text-align:center;}
+  footer .footer-sigil{width:34px;opacity:0.5;margin:0 auto 16px;}
+  footer .mono{color:var(--bone-dim);opacity:0.6;}
+
+  @media (max-width:720px){
+    section{padding:76px 0;}
+    .record{grid-template-columns:1fr;}
+    .cover{width:150px;height:222px;}
+    .author-grid{grid-template-columns:1fr;}
+    .author-mark{display:none;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="ash-particles" id="ashField" aria-hidden="true"></div>
+  <div class="skyline" aria-hidden="true"></div>
+  <div class="glow-seam" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <svg class="sigil" viewBox="0 0 120 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Ward, founding sigil of the Aegis Cycle">
+      <!-- The Ward: heater-shield silhouette, left taper deliberately unclosed near the base -->
+      <path class="stroke" d="M60 6 C90 6 106 20 106 20 L106 76 C106 108 84 130 60 144
+             C46 136 34 126 27 112"
+            stroke="#eae4d6" stroke-width="2" stroke-linecap="round"/>
+      <path class="stroke" d="M60 6 C30 6 14 20 14 20 L14 70 C14 84 17 96 22 100"
+            stroke="#eae4d6" stroke-width="2" stroke-linecap="round" style="animation-delay:0.5s;"/>
+      <!-- flanking curved lines, echoing the pairs who traced it -->
+      <path d="M46 30 C40 46 40 62 46 76" stroke="#8d8676" stroke-width="1" fill="none" opacity="0.6"/>
+      <path d="M74 30 C80 46 80 62 74 76" stroke="#8d8676" stroke-width="1" fill="none" opacity="0.6"/>
+      <!-- the eye: three concentric ovals around a tight spiral -->
+      <ellipse cx="60" cy="54" rx="20" ry="13" stroke="#e0a438" stroke-width="1"/>
+      <ellipse cx="60" cy="54" rx="14" ry="9" stroke="#e0a438" stroke-width="1"/>
+      <ellipse cx="60" cy="54" rx="8" ry="5.5" stroke="#e0a438" stroke-width="1"/>
+      <path d="M60 54 m0,-3 a3,3 0 1,1 -2.6,1.5" stroke="#e0a438" stroke-width="1.1" fill="none"/>
+    </svg>
+
+    <span class="kicker mono">Donald Bowen</span>
+    <h1>THE <em>AEGIS</em> CYCLE</h1>
+    <p class="tagline">A shield built from a captured piece of the very thing it guards against.</p>
+  </div>
+
+  <div class="scrollcue"><span class="mono">Descend</span><span class="line"></span></div>
+</header>
+
+<!-- ================= PREMISE ================= -->
+<section class="premise">
+  <div class="wrap">
+    <p>A century after the ash fell, <span>New Meridian</span> survives inside a sealed glass dome — kept alive by machinery its own people no longer understand, and watched over by an order that has done this before, on other worlds, in other centuries, and has never once told the truth about why.</p>
+  </div>
+</section>
+
+<!-- ================= THE RECORD ================= -->
+<section id="books">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="mono">The Record</span>
+      <h2>Three books. One cycle.</h2>
+    </div>
+
+    <div class="record-list" id="recordList"><!-- populated by script from SERIES_BOOKS --></div>
+  </div>
+</section>
+
+<!-- ================= OTHER TITLES ================= -->
+<section class="other-titles" id="other-titles">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="mono">Elsewhere In Print</span>
+      <h2>Other titles</h2>
+    </div>
+    <div class="other-list" id="otherList"><!-- populated by script from OTHER_BOOKS --></div>
+  </div>
+</section>
+
+<!-- ================= AUTHOR ================= -->
+<section class="author" id="author">
+  <div class="wrap">
+    <div class="author-grid">
+      <svg class="author-mark" viewBox="0 0 120 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M60 6 C90 6 106 20 106 20 L106 76 C106 108 84 130 60 144 C46 136 34 126 27 112" stroke="#eae4d6" stroke-width="2"/>
+        <path d="M60 6 C30 6 14 20 14 20 L14 70 C14 84 17 96 22 100" stroke="#eae4d6" stroke-width="2"/>
+        <ellipse cx="60" cy="54" rx="20" ry="13" stroke="#e0a438" stroke-width="1"/>
+        <ellipse cx="60" cy="54" rx="14" ry="9" stroke="#e0a438" stroke-width="1"/>
+        <ellipse cx="60" cy="54" rx="8" ry="5.5" stroke="#e0a438" stroke-width="1"/>
+      </svg>
+      <div>
+        <span class="mono" style="color:var(--frost);display:block;margin-bottom:14px;">The Author</span>
+        <h2>Donald Bowen</h2>
+        <span class="role mono">Writer of the Aegis Cycle</span>
+        <p>Donald Bowen holds a doctorate in criminal justice and a master's degree in sociology — a background that shows up throughout the Aegis Cycle less as research than as instinct: an eye for how institutions protect themselves, how secrecy calcifies into policy, and how the people inside a system learn to call its costs by gentler names.</p>
+        <p>The Aegis Cycle began as a single question — what does an organization become after it has kept the same secret for a hundred years — and grew into a series about the machinery, human and otherwise, that a society builds to survive, and what that machinery quietly demands in return.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SIGNAL / CONTACT ================= -->
+<section class="signal" id="signal">
+  <div class="wrap">
+    <span class="mono" style="color:var(--frost);">Send Word</span>
+    <h2 style="margin-top:14px;">Hear when the next book surfaces</h2>
+    <p>No noise, no schedule to keep up with — just word when The Aegis Covenant is ready, and nothing before then.</p>
+    <form class="signal-form" onsubmit="return false;">
+      <input type="email" placeholder="you@example.com" aria-label="Email address" required>
+      <button type="submit">Notify me</button>
+    </form>
+    <p class="form-note">This form isn't wired to anything yet — connect it to your mailing list provider of choice.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <svg class="footer-sigil" viewBox="0 0 120 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M60 6 C90 6 106 20 106 20 L106 76 C106 108 84 130 60 144 C46 136 34 126 27 112" stroke="#eae4d6" stroke-width="2"/>
+      <path d="M60 6 C30 6 14 20 14 20 L14 70 C14 84 17 96 22 100" stroke="#eae4d6" stroke-width="2"/>
+    </svg>
+    <span class="mono">The Aegis Cycle &middot; Donald Bowen &middot; &copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+  /* =====================================================================
+     BOOK CONFIG
+     Add, remove, or edit books by editing the arrays below — nothing else
+     on the page needs to change.
+
+     For a retailer you don't have a link for yet, leave the string EMPTY
+     ("") and the site will show "Link coming soon" instead of a dead
+     button. Paste the real URL in whenever you have it.
+
+     SERIES_BOOKS -> renders as an illustrated "Record" card (Aegis Cycle).
+       coverClass: "" | "dim" | "veiled"   (controls how faded the cover art looks)
+       status:     "published" | "draft" | "planned"
+     OTHER_BOOKS  -> renders as a simple row in "Other Titles" (any other
+       book you've written, unrelated to the series).
+  ===================================================================== */
+
+  const SERIES_BOOKS = [
+    {
+      title: "The Aegis Charter",
+      coverLines: ["THE", "AEGIS", "CHARTER"],
+      coverClass: "",
+      status: "published",
+      statusLabel: "Published · Book One",
+      subtitle: "A technician framed. A city that runs on a lie it filed as routine.",
+      desc: "Phralen is framed for a sabotage he didn't commit — and in clearing his name, uncovers the order that built New Meridian's dome, the machinery it left behind, and the corruption the city has learned to call allocation instead of what it is.",
+      links: { amazon: "", bn: "" }
+    },
+    {
+      title: "The Aegis Covenant",
+      coverLines: ["THE", "AEGIS", "COVENANT"],
+      coverClass: "dim",
+      status: "draft",
+      statusLabel: "In Draft · Book Two (Prequel)",
+      subtitle: "Before the dome had a name, two engineers traced a mark into wet concrete.",
+      desc: "Generations before Phralen's city, a small order prepares for a disaster nobody but them can see coming — and pays for the shield they build with the people who build it. The founding story behind everything Book One left buried.",
+      progress: 64,
+      links: { amazon: "", bn: "" }
+    },
+    {
+      title: "Untitled",
+      coverLines: ["BOOK", "THREE"],
+      coverClass: "veiled",
+      status: "planned",
+      statusLabel: "Planned · Book Three",
+      subtitle: "Something answered, once, on an old frequency. Nobody ever found out what.",
+      desc: "The closing book of the cycle — a search beyond the only home its characters have ever known, toward a signal received decades ago and never explained.",
+      links: {}
+    }
+  ];
+
+  const OTHER_BOOKS = [
+    {
+      title: "Criminogenic Embeddedness and Criminal Trajectories",
+      subtitle: "A Life-Course Model of Strain, Control, and Social Learning",
+      desc: "A criminology monograph developing the Criminogenic Embeddedness Model (CEM) — a relational account of how strain, social control, and social learning interact across the life course.",
+      links: { amazon: "https://www.amazon.com/dp/B0HFMHM93F", bn: "" }
+    }
+    // To add another unrelated title, copy the block above and edit the fields.
+  ];
+
+  function retailerLinks(links){
+    const order = [["amazon","Amazon"],["bn","Barnes & Noble"]];
+    return order.map(([key,label]) => {
+      const url = links && links[key];
+      if (url){
+        return `<a class="btn" href="${url}" target="_blank" rel="noopener">${label}</a>`;
+      }
+      return `<span class="ghost-link disabled" aria-disabled="true">${label} · link coming soon</span>`;
+    }).join("");
+  }
+
+  function renderSeriesBooks(){
+    const root = document.getElementById('recordList');
+    if (!root) return;
+    root.innerHTML = SERIES_BOOKS.map(b => `
+      <article class="record">
+        <div class="cover ${b.coverClass}">
+          <div class="sky"></div>
+          <div class="glow"></div>
+          <div class="dome"></div>
+          <div class="cover-title">${b.coverLines.join('<br>')}</div>
+        </div>
+        <div class="record-body">
+          <span class="status ${b.status} mono">${b.statusLabel}</span>
+          <h3>${b.title}</h3>
+          <span class="subtitle">${b.subtitle}</span>
+          <p class="desc">${b.desc}</p>
+          ${b.progress ? `
+            <div class="progress-track"><div class="progress-fill" style="width:${b.progress}%;"></div></div>
+            <span class="progress-label">Manuscript in progress</span>
+          ` : ''}
+          <div class="record-actions">
+            ${retailerLinks(b.links)}
+            ${b.status !== 'published' ? '<a class="ghost-link" href="#signal">Get notified on release</a>' : ''}
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  function renderOtherBooks(){
+    const root = document.getElementById('otherList');
+    if (!root) return;
+    root.innerHTML = OTHER_BOOKS.map(b => `
+      <div class="other-row">
+        <div>
+          <h3>${b.title}</h3>
+          <span class="subtitle">${b.subtitle}</span>
+          <p class="other-desc">${b.desc}</p>
+        </div>
+        <div class="other-links">${retailerLinks(b.links)}</div>
+      </div>
+    `).join('');
+  }
+
+  renderSeriesBooks();
+  renderOtherBooks();
+
+  // scatter ash particles across the hero
+  (function(){
+    var field = document.getElementById('ashField');
+    if (!field) return;
+    var count = window.innerWidth < 720 ? 14 : 26;
+    for (var i = 0; i < count; i++){
+      var s = document.createElement('span');
+      var left = Math.random()*100;
+      var dur = 10 + Math.random()*14;
+      var delay = Math.random()*-20;
+      var drift = (Math.random()*60 - 30) + 'px';
+      var size = (1.5 + Math.random()*2.5).toFixed(1) + 'px';
+      s.style.left = left + '%';
+      s.style.width = size;
+      s.style.height = size;
+      s.style.setProperty('--drift', drift);
+      s.style.animationDuration = dur + 's';
+      s.style.animationDelay = delay + 's';
+      field.appendChild(s);
+    }
+  })();
+</script>
+
+</body>
+</html>
